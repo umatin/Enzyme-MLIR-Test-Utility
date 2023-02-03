@@ -17,17 +17,17 @@ RUNNER_UTILS = mlir_path + "/lib/libmlir_runner_utils.so"
 C_RUNNER_UTILS = mlir_path + "/lib/libmlir_c_runner_utils.so"
 
 def lower_base_enzyme(filename):
-    LOWER = ENZYMEMLIR_OPT + " " + filename + " -lower-to-llvm-enzyme"
+    LOWER = ENZYMEMLIR_OPT + " " + filename + " -lower-to-llvm-enzyme -reconcile-unrealized-casts"
     MEMREF_TO_LLVM = MLIR_OPT + " -convert-memref-to-llvm -convert-arith-to-llvm -reconcile-unrealized-casts"
     TRANSLATE = MLIR_TRANSLATE + " -mlir-to-llvmir"
     RUN_ENZYME = OPT + " -load " + ENZYME_DYLIB + " -enable-new-pm=0 -enzyme -S"
     JIT = LLI + " -load=" + RUNNER_UTILS + " -load=" + C_RUNNER_UTILS
 
-    return LOWER + " | " + MEMREF_TO_LLVM + " | " + TRANSLATE + " | " + RUN_ENZYME + " | " + JIT
+    return LOWER #+ " | " + MEMREF_TO_LLVM + " | " + TRANSLATE + " | " + RUN_ENZYME + " | " + JIT
 
 def lower_mlir_enzyme(filename):
     LOWER = ENZYMEMLIR_OPT + " " + filename + " -enzyme --convert-enzyme-to-memref -reconcile-unrealized-casts"
-    MEMREF_TO_LLVM = MLIR_OPT + " -convert-func-to-llvm -convert-memref-to-llvm -convert-arith-to-llvm -reconcile-unrealized-casts"
+    MEMREF_TO_LLVM = MLIR_OPT + " -convert-scf-to-cf -convert-cf-to-llvm -convert-func-to-llvm -convert-memref-to-llvm -convert-arith-to-llvm -reconcile-unrealized-casts"
     TRANSLATE = MLIR_TRANSLATE + " -mlir-to-llvmir"
     JIT = LLI + " -load=" + RUNNER_UTILS + " -load=" + C_RUNNER_UTILS
 
@@ -75,18 +75,22 @@ def compare_output(base, mlir):
     return True
 
 
-
-file = "src/2.mlir"
-
 parser = argparse.ArgumentParser(
                     prog = 'Test Enzyme MLIR',
                     description = 'Checks if Enzyme MLIR returns approximately the same values as Enzyme(llvm)',
                     epilog = '')
 
 parser.add_argument('filename')
+parser.add_argument('-m', '--mlir-help', action='store_true')
+parser.add_argument('-e', '--enzyme-help', action='store_true')
 parser.add_argument('-s', '--show-output', action='store_true')
 
 args = parser.parse_args()
+
+if args.mlir_help:
+    os.system(MLIR_OPT + " --help")
+if args.enzyme_help:
+    os.system(ENZYMEMLIR_OPT + " --help")
 
 file = args.filename
 
@@ -96,10 +100,14 @@ result_mlir, err_mlir = run_command(lower_mlir_enzyme(file))
 if args.show_output:
     print("LLVM")
     print(result_base)
+if len(err_base) > 0:
     print("LLVM err")
     print(err_base)
+
+if args.show_output:
     print("MLIR")
     print(result_mlir)
+if len(err_mlir) > 0:
     print("MLIR err")
     print(err_mlir)
 
