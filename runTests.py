@@ -23,7 +23,7 @@ def lower_base_enzyme(filename):
     RUN_ENZYME = OPT + " -load " + ENZYME_DYLIB + " -enable-new-pm=0 -enzyme -S"
     JIT = LLI + " -load=" + RUNNER_UTILS + " -load=" + C_RUNNER_UTILS
 
-    return LOWER #+ " | " + MEMREF_TO_LLVM + " | " + TRANSLATE + " | " + RUN_ENZYME + " | " + JIT
+    return LOWER + " | " + MEMREF_TO_LLVM + " | " + TRANSLATE + " | " + RUN_ENZYME + " | " + JIT
 
 def lower_mlir_enzyme(filename):
     LOWER = ENZYMEMLIR_OPT + " " + filename + " -enzyme --convert-enzyme-to-memref -reconcile-unrealized-casts"
