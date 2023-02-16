@@ -7,8 +7,8 @@ f  =  open("paths.txt", "r")
 mlir_path = f.readline().rstrip()
 enzyme_path = f.readline().rstrip()
 
-ENZYMEMLIR_OPT = enzyme_path + "/Enzyme/MLIR/enzymemlir-opt"
-ENZYME_DYLIB = enzyme_path + "/Enzyme/LLVMEnzyme-16.so"
+ENZYMEMLIR_OPT = enzyme_path + "/enzyme/build/Enzyme/MLIR/enzymemlir-opt"
+ENZYME_DYLIB = enzyme_path + "/enzyme/build/Enzyme/LLVMEnzyme-16.so"
 OPT = mlir_path + "/bin/opt"
 LLI = mlir_path + "/bin/lli"
 MLIR_OPT = mlir_path + "/bin/mlir-opt"
@@ -17,21 +17,26 @@ RUNNER_UTILS = mlir_path + "/lib/libmlir_runner_utils.so"
 C_RUNNER_UTILS = mlir_path + "/lib/libmlir_c_runner_utils.so"
 
 def lower_base_enzyme(filename):
-    LOWER = ENZYMEMLIR_OPT + " " + filename + " -lower-to-llvm-enzyme -reconcile-unrealized-casts"
-    MEMREF_TO_LLVM = MLIR_OPT + " -convert-memref-to-llvm -convert-arith-to-llvm -reconcile-unrealized-casts"
+    fname = "out/" + filename.split("/")[-1][:-5] + "_base.mlir"
+    LOWER = ENZYMEMLIR_OPT + " " + filename + " -lower-to-llvm-enzyme -reconcile-unrealized-casts -o " + fname
+    MEMREF_TO_LLVM = MLIR_OPT + " " + fname + " -convert-memref-to-llvm -convert-arith-to-llvm -reconcile-unrealized-casts"
     TRANSLATE = MLIR_TRANSLATE + " -mlir-to-llvmir"
     RUN_ENZYME = OPT + " -load " + ENZYME_DYLIB + " -enable-new-pm=0 -enzyme -S"
     JIT = LLI + " -load=" + RUNNER_UTILS + " -load=" + C_RUNNER_UTILS
 
-    return LOWER + " | " + MEMREF_TO_LLVM + " | " + TRANSLATE + " | " + RUN_ENZYME + " | " + JIT
+    return LOWER + " && " + MEMREF_TO_LLVM + " | " + TRANSLATE + " | " + RUN_ENZYME + " | " + JIT
 
 def lower_mlir_enzyme(filename):
-    LOWER = ENZYMEMLIR_OPT + " " + filename + " -enzyme --convert-enzyme-to-memref -reconcile-unrealized-casts"
-    MEMREF_TO_LLVM = MLIR_OPT + " -convert-scf-to-cf -convert-cf-to-llvm -convert-func-to-llvm -convert-memref-to-llvm -convert-arith-to-llvm -reconcile-unrealized-casts"
-    TRANSLATE = MLIR_TRANSLATE + " -mlir-to-llvmir"
-    JIT = LLI + " -load=" + RUNNER_UTILS + " -load=" + C_RUNNER_UTILS
+    fname = "out/" + filename.split("/")[-1][:-5] + "_mlir.mlir"
+    fname2 = "out/" + filename.split("/")[-1][:-5] + "_mlir2.mlir"
+    fname_llvm = "out/" + filename.split("/")[-1][:-5] + "_llvm.ll"
+    LOWER = ENZYMEMLIR_OPT + " " + filename + " -enzyme -symbol-dce -o " + fname
+    LOWER2 = ENZYMEMLIR_OPT + " " + fname + " -convert-enzyme-shadowed-gradient-to-cache --convert-enzyme-to-memref -reconcile-unrealized-casts -o " + fname2
+    MEMREF_TO_LLVM = MLIR_OPT + " " + fname2 + " -convert-scf-to-cf -convert-cf-to-llvm -convert-func-to-llvm -convert-memref-to-llvm -convert-arith-to-llvm -reconcile-unrealized-casts"
+    TRANSLATE = MLIR_TRANSLATE + " -mlir-to-llvmir -o " + fname_llvm
+    JIT = LLI + " -load=" + RUNNER_UTILS + " -load=" + C_RUNNER_UTILS + " " + fname_llvm
 
-    return LOWER + " | " + MEMREF_TO_LLVM + " | " + TRANSLATE+ " | " + JIT
+    return LOWER + " && " + LOWER2 + " && " + MEMREF_TO_LLVM + " | " + TRANSLATE+ " && " + JIT
 
 def run_command(command):
     ret = subprocess.run(command, shell=True, text = True, capture_output = True)

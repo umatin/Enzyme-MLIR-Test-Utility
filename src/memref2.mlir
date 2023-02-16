@@ -4,13 +4,7 @@ func.func private @printNewline() -> ()
 
 func.func @f(%arg0: memref<?xf64>, %arg1 : f64) -> f64 {
     %c0 = arith.constant 0 : index
-
-    %3 = memref.load %arg0[%c0] : memref<?xf64>
-    %2 = arith.addf %arg1, %3 : f64
-
-    %mem = memref.alloc (%c0) : memref<?xf64>
-    memref.store %2, %mem[%c0] : memref<?xf64>
-    %1 = memref.load %mem[%c0] : memref<?xf64>
+    %1 = memref.load %arg0[%c0] : memref<?xf64>
 
     return %1 : f64
 }
@@ -23,7 +17,7 @@ func.func @df(%arg0: memref<?xf64>, %arg1: memref<?xf64>, %arg2 : f64, %arg3 : f
 func.func @main() -> () {
     %cst0 = arith.constant 0.00 : f64
     %cst1 = arith.constant 1.00 : f64
-    %csti1 = arith.constant 1 : index
+    %csti1 = arith.constant 10 : index
 
     %mem = memref.alloc (%csti1) : memref<?xf64>
     %mem_shadow = memref.alloc (%csti1) : memref<?xf64>
