@@ -19,10 +19,10 @@ RUNNER_UTILS = MLIR_LIB / f"libmlir_runner_utils.{LIB_EXT}"
 C_RUNNER_UTILS = MLIR_LIB / f"libmlir_c_runner_utils.{LIB_EXT}"
 
 
-def run_safe(args, stdin: bytes = None) -> bytes:
+def run_safe(args, stdin: bytes = None, suppress_stderr=False) -> bytes:
     try:
         p = subprocess.run(args, input=stdin, check=True, capture_output=True)
-        if p.stderr:
+        if p.stderr and not suppress_stderr:
             print(p.stderr.decode("utf-8"))
     except subprocess.CalledProcessError as e:
         print(e.stdout.decode("utf-8"))
@@ -44,6 +44,7 @@ def lower_to_llvm_dialect(source: bytes) -> bytes:
     memref_dialect = run_safe([ENZYMEMLIR_OPT] + lower_enzyme_args, stdin=source)
 
     lower_to_llvm_args = [
+        "-convert-linalg-to-loops",
         "-convert-scf-to-cf",
         "-convert-cf-to-llvm",
         "-convert-func-to-llvm",
@@ -68,3 +69,12 @@ def jit_mlir(source: bytes):
     lowered = lower_to_llvm_dialect(differentiate(source))
     stdout = run_safe([MLIR_CPU_RUNNER] + jit_args, stdin=lowered)
     return stdout.decode("utf-8")
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("mlir_file")
+    args = parser.parse_args()
+    print(jit_file(args.mlir_file))

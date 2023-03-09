@@ -19,7 +19,7 @@ func.func @main() {
   %cst = arith.constant 2.00000e+00 : f64
   %cst_0 = arith.constant 0.000000e+00 : f64
   %cst_1 = arith.constant 1.000000e+00 : f64
-  %0 = enzyme.diff @ppow(%cst, %cst_0, %cst_1) {activity = [#enzyme<activity enzyme_dup>]} : (f64, f64, f64) -> f64
+  %0 = enzyme.autodiff @ppow(%cst, %cst_1) {activity = [#enzyme<activity enzyme_out>]} : (f64, f64) -> f64
   //%0 = call @ppow(%cst) : (f64) -> (f64)
   call @printF64(%0) : (f64) -> ()
   return

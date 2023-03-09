@@ -12,15 +12,15 @@ func.func @f(%x : f64) -> f64 {
     return %x : f64
 }
 
-func.func @df(%x : f64, %dx : f64, %gradient : f64) -> (f64) {
-    %r = enzyme.diff @f(%x, %dx, %gradient) { activity=[#enzyme<activity enzyme_dup>] } : (f64, f64, f64) -> (f64)
+func.func @df(%x : f64, %gradient : f64) -> (f64) {
+    %r = enzyme.autodiff @f(%x, %gradient) { activity=[#enzyme<activity enzyme_out>] } : (f64, f64) -> (f64)
     return %r: f64
 }
 
 func.func @main() -> () {
     %cst0 = arith.constant 0.00 : f64
     %cst1 = arith.constant 1.0 : f64
-    %f = call @df(%cst1, %cst0, %cst1) : (f64, f64, f64) -> (f64)
+    %f = call @df(%cst1, %cst1) : (f64, f64) -> (f64)
     call @printF64(%f) : (f64) -> ()
     return
 }
