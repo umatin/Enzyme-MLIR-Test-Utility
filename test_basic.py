@@ -28,9 +28,8 @@ def test_pow_cf():
     assert pytest.approx(execute("src/pow_cf.mlir")) == [10 * 1.3 ** 9]
 
 
-def disabled_test_pow_scf():
-    # TODO: scf.for with free vars currently not working
-    assert pytest.approx(execute("src/pow.mlir")) == [10 * 1.3 ** 9]
+def test_constant_arg():
+    assert execute("src/const_arg.mlir") == [17]
 
 
 def test_multi_use():
