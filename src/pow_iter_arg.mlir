@@ -10,7 +10,9 @@ func.func @ppow(%x: f64) -> f64 {
     %r_next = arith.addf %r_it, %r_it : f64
     scf.yield %r_next : f64
   }
-  return %res : f64
+
+  %res0 = arith.addf %res, %x : f64
+  return %res0 : f64
 }
 
 func.func @main() {
