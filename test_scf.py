@@ -1,6 +1,7 @@
 from toolchain import jit_file
 from stdout_parser import parse_results
 import pytest
+import numpy as np
 
 
 def execute(filename: str):
@@ -17,3 +18,10 @@ def test_pow_active_iter():
 
 def test_pow_multi_iter():
     assert pytest.approx(execute("src/for_multi_iter.mlir")) == [116.045]
+
+
+@pytest.mark.skip(reason="Known issue with memrefs in iter args")
+def test_memref_iter_arg():
+    assert pytest.approx(np.array(execute("src/scf_memref_iterarg.mlir"))) == np.array(
+        [[58.4688, 51.1566]]  # Verified against Enzyme and JAX
+    )
