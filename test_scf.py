@@ -25,3 +25,8 @@ def test_memref_iter_arg():
     assert pytest.approx(np.array(execute("src/scf_memref_iterarg.mlir"))) == np.array(
         [[58.4688, 51.1566]]  # Verified against Enzyme and JAX
     )
+
+
+@pytest.mark.skip(reason="Known issue with nested loops")
+def test_pow_nested():
+    assert pytest.approx(execute("src/pow_nested.mlir")) == [9 * 1.3 ** 8]

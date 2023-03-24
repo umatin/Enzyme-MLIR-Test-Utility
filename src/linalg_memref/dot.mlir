@@ -25,8 +25,6 @@ func.func @dot_prod(%x: memref<4xf64>) -> f64 {
 memref.global @x : memref<4xf64> = dense<[1., 2., 3., 4.]>
 
 func.func @main() {
-  // %c0 = arith.constant 0 : index
-  // %c1 = arith.constant 1 : index
   %zero = arith.constant 0.0 : f64
   %x = memref.get_global @x : memref<4xf64>
   %dx = memref.alloca() : memref<4xf64>
