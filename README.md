@@ -8,6 +8,7 @@ Write the absolute path to the mlir build directory and enzyme directory into pa
 Install dependencies (ideally in a virtual env):
 ```sh
 pip install -r requirements.txt
+python benchmarks/build.py # Optional, to run larger benchmarks
 ```
 
 Run tests:

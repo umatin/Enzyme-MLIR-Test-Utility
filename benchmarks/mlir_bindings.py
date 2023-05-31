@@ -226,10 +226,10 @@ mlp_args = (
     + memref_2d_f32
     + memref_1d_f32
 )
-mlirlib.mlir_mlp_batched.argtypes = mlp_args
-mlirlib.mlir_mlp_batched.restype = ctypes.c_float
-# mlirlib.enzyme_mlp_batched.argtypes = mlp_args
-# mlirlib.enzyme_mlp_batched.restype = MNISTGrad
+mlirlib.mnist_mlp.argtypes = mlp_args
+mlirlib.mnist_mlp.restype = ctypes.c_float
+# mlirlib.enzyme_mnist_mlp.argtypes = mlp_args
+# mlirlib.enzyme_mnist_mlp.restype = MNISTGrad
 
 
 def wrap(mlir_func):
@@ -240,5 +240,5 @@ def wrap(mlir_func):
     return wrapped
 
 
-mlir_mlp_primal = wrap(mlirlib.mlir_mlp_batched)
-# lagrad_mlp = wrap(mlirlib.enzyme_mlp_batched)
+mnist_mlp_primal = wrap(mlirlib.mnist_mlp)
+# enzyme_mnist_mlp = wrap(mlirlib.enzyme_mnist_mlp)
