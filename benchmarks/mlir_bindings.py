@@ -228,8 +228,8 @@ mlp_args = (
 )
 mlirlib.mnist_mlp.argtypes = mlp_args
 mlirlib.mnist_mlp.restype = ctypes.c_float
-# mlirlib.enzyme_mnist_mlp.argtypes = mlp_args
-# mlirlib.enzyme_mnist_mlp.restype = MNISTGrad
+mlirlib.enzyme_mnist_mlp.argtypes = mlp_args
+mlirlib.enzyme_mnist_mlp.restype = MNISTGrad
 
 
 def wrap(mlir_func):
@@ -241,4 +241,4 @@ def wrap(mlir_func):
 
 
 mnist_mlp_primal = wrap(mlirlib.mnist_mlp)
-# enzyme_mnist_mlp = wrap(mlirlib.enzyme_mnist_mlp)
+enzyme_mnist_mlp = wrap(mlirlib.enzyme_mnist_mlp)
