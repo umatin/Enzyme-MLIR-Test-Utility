@@ -30,9 +30,14 @@ def lower_mlir_enzyme(filename):
     fname = "out/" + filename.split("/")[-1][:-5] + "_mlir.mlir"
     fname2 = "out/" + filename.split("/")[-1][:-5] + "_mlir2.mlir"
     fname_llvm = "out/" + filename.split("/")[-1][:-5] + "_llvm.ll"
-    LOWER = ENZYMEMLIR_OPT + " " + filename + " -enzyme -symbol-dce -o " + fname
+    
+    #LOWER = ENZYMEMLIR_OPT + " " + filename + " -enzyme -simplify-memref-cache -add-to-op-to-index-and-load -symbol-dce -o " + fname
+    LOWER = ENZYMEMLIR_OPT + " " + filename + " -enzyme -simplify-memref-cache -add-to-op-to-split -symbol-dce -o " + fname
+    
     LOWER2 = ENZYMEMLIR_OPT + " " + fname + " -convert-enzyme-shadowed-gradient-to-cache --convert-enzyme-to-memref -reconcile-unrealized-casts -o " + fname2
-    MEMREF_TO_LLVM = MLIR_OPT + " " + fname2 + " -convert-scf-to-cf -convert-cf-to-llvm -convert-func-to-llvm -convert-memref-to-llvm -convert-arith-to-llvm -reconcile-unrealized-casts"
+    #MEMREF_TO_LLVM = MLIR_OPT + " " + fname2 + " -convert-linalg-to-loops -convert-scf-to-cf -convert-cf-to-llvm -convert-func-to-llvm -convert-memref-to-llvm -convert-arith-to-llvm -convert-index-to-llvm -reconcile-unrealized-casts"
+    MEMREF_TO_LLVM = MLIR_OPT + " " + fname2 + " --test-lower-to-llvm"
+    
     TRANSLATE = MLIR_TRANSLATE + " -mlir-to-llvmir -o " + fname_llvm
     JIT = LLI + " -load=" + RUNNER_UTILS + " -load=" + C_RUNNER_UTILS + " " + fname_llvm
 

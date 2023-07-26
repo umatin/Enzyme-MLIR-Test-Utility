@@ -4,7 +4,8 @@ import re
 import argparse
 
 f  =  open("paths.txt", "r")
-mlir_path = f.readline().rstrip()
+mlir_path = "/local/temp/JAX-Devving/mlir_enzyme/update/mlir-build"
+f.readline()
 enzyme_path = f.readline().rstrip()
 CLANG_FORMAT = mlir_path + "/bin/clang-format"
 
@@ -13,7 +14,7 @@ def run_command(command):
     return ret.stdout, ret.stderr
     
 def format(path):
-    run_command(CLANG_FORMAT + " -i " + path + "*.cpp " + path + "*.h")
+    print(run_command(CLANG_FORMAT + " -i " + path + "*.cpp " + path + "*.h"))
 
 MLIR = enzyme_path + "/enzyme/Enzyme/MLIR"
 format(MLIR)

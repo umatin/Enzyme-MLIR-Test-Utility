@@ -8,14 +8,13 @@ func.func @dot_prod(%x: memref<4xf64>) -> f64 {
   memref.store %zero, %space[] : memref<f64>
   linalg.generic
     {
-      indexing_maps = [#map, #map, #map1],
+      indexing_maps = [#map, #map1],
       iterator_types = ["reduction"]
     }
-    ins(%x, %x : memref<4xf64>, memref<4xf64>)
+    ins(%x : memref<4xf64>)
     outs(%space : memref<f64>) {
-      ^bb0(%in0: f64, %in1: f64, %out: f64):
-        %0 = arith.mulf %in0, %in1 : f64
-        %1 = arith.addf %0, %out : f64
+      ^bb0(%in0: f64, %out: f64):
+        %1 = arith.addf %in0, %out : f64
         linalg.yield %1 : f64
     }
   %result = memref.load %space[] : memref<f64>
