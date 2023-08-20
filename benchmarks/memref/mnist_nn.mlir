@@ -148,41 +148,41 @@ module  {
     linalg.fill ins(%zero : f32) outs(%dweight2 : memref<10x512xf32>)
     linalg.fill ins(%zero : f32) outs(%dbias2 : memref<10xf32>)
 
-    // enzyme.autodiff @mnist_mlp_memref(
-    //   %arg0, %arg1,
-    //   %arg2, %dweight0,
-    //   %arg3, %dbias0,
-    //   %arg4, %dweight1,
-    //   %arg5, %dbias1,
-    //   %arg6, %dweight2,
-    //   %arg7, %dbias2
-    // ) {
-    //   activity = [
-    //     #enzyme<activity enzyme_const>,
-    //     #enzyme<activity enzyme_const>,
-    //     #enzyme<activity enzyme_dup>,
-    //     #enzyme<activity enzyme_dup>,
-    //     #enzyme<activity enzyme_dup>,
-    //     #enzyme<activity enzyme_dup>,
-    //     #enzyme<activity enzyme_dup>,
-    //     #enzyme<activity enzyme_dup>
-    //   ]
-    // } : (
-    //   memref<784x64xf32>,
-    //   memref<64xi32>,
-    //   memref<512x784xf32>,
-    //   memref<512x784xf32>,
-    //   memref<512xf32>,
-    //   memref<512xf32>,
-    //   memref<512x512xf32>,
-    //   memref<512x512xf32>,
-    //   memref<512xf32>,
-    //   memref<512xf32>,
-    //   memref<10x512xf32>,
-    //   memref<10x512xf32>,
-    //   memref<10xf32>,
-    //   memref<10xf32>
-    // ) -> f32
+    enzyme.autodiff @mnist_mlp(
+      %arg0, %arg1,
+      %arg2, %dweight0,
+      %arg3, %dbias0,
+      %arg4, %dweight1,
+      %arg5, %dbias1,
+      %arg6, %dweight2,
+      %arg7, %dbias2
+    ) {
+      activity = [
+        #enzyme<activity enzyme_const>,
+        #enzyme<activity enzyme_const>,
+        #enzyme<activity enzyme_dup>,
+        #enzyme<activity enzyme_dup>,
+        #enzyme<activity enzyme_dup>,
+        #enzyme<activity enzyme_dup>,
+        #enzyme<activity enzyme_dup>,
+        #enzyme<activity enzyme_dup>
+      ]
+    } : (
+      memref<784x64xf32>,
+      memref<64xi32>,
+      memref<512x784xf32>,
+      memref<512x784xf32>,
+      memref<512xf32>,
+      memref<512xf32>,
+      memref<512x512xf32>,
+      memref<512x512xf32>,
+      memref<512xf32>,
+      memref<512xf32>,
+      memref<10x512xf32>,
+      memref<10x512xf32>,
+      memref<10xf32>,
+      memref<10xf32>
+    ) -> f32
 
     return %dweight0, %dbias0, %dweight1, %dbias1, %dweight2, %dbias2 :
       memref<512x784xf32>,
